@@ -5,11 +5,10 @@ const dgram = require('dgram');
 const Buffer = require('buffer').Buffer;
 const urlParse = require('url').parse;
 
-const tracker = require('./tracker');
-const torrentParser = require('./torrent-parser');
+const tracker = require('./src/tracker');
+const download = require('./src/download');
+const torrentParser = require('./src/torrent-parser');
 
-const torrent = torrentParser.open('puppy.torrent');
+const torrent = torrentParser.open(process.argv[2]);
 
-tracker.getPeers(torrent, peers => {
-  console.log('list of peers: ', peers);
-});
+download(torrent);

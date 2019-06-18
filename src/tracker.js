@@ -5,7 +5,7 @@ const Buffer =  require('buffer').Buffer;
 const urlParse = require('url').parse;
 const crypto = require('crypto');
 
-const torrentParse = require('.torrent-parser');
+const torrentParser = require('./torrent-parser');
 const util = require('./util');
 
 function udpSend(socket, message, rawUrl, callback=()=>{}) {
