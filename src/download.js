@@ -22,8 +22,52 @@ function onWholeMsgReceived(socket, callback) {
   });
 }
 
+function chokeHandler() {
+
+}
+
+function unchokeHandler() {
+
+}
+
+function haveHandler(payload) {
+
+}
+
+function bitfieldHandler(payload) {
+
+}
+
+function pieceHandler(payload) {
+
+}
+
 function msgHandler(msg, socket) {
-  if(isHandShake(msg)) socket.write(message.buildInterested())
+  if(isHandShake(msg)) {
+    socket.write(message.buildInterested());
+  } else {
+    const m = message.parse(msg);
+
+    switch(m.id) {
+      case 0:
+        chokeHandler();
+        break;
+      case 1:
+        unchokeHandler();
+        break;
+      case 4:
+        haveHandler(m.payload);
+        break;
+      case 5:
+        bitfieldHandler(m.payload);
+        break;
+      case 7:
+        pieceHandler(m.payload);
+        break;
+      default:
+        return;
+    }
+  }
 }
 
 function isHandShake(msg) {
