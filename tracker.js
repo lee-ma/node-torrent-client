@@ -4,10 +4,10 @@ const dgram = require('dgram');
 const Buffer =  require('buffer').Buffer;
 const urlParse = require('url').parse;
 
-function udpSend(socket, message, rawUrl, callback = () => {
+function udpSend(socket, message, rawUrl, callback=()=>{}) {
   const url = urlParse(rawUrl);
   socket.send(message, 0, message.length, url.port, url.host, callback);
-});
+};
 
 function getResType(res) {
   
