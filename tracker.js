@@ -5,6 +5,9 @@ const Buffer =  require('buffer').Buffer;
 const urlParse = require('url').parse;
 const crypto = require('crypto');
 
+const torrentParse = require('.torrent-parser');
+const util = require('./util');
+
 function udpSend(socket, message, rawUrl, callback=()=>{}) {
   const url = urlParse(rawUrl);
   socket.send(message, 0, message.length, url.port, url.host, callback);
@@ -56,7 +59,7 @@ function parseConnectionResponse(res) {
   }
 }
 
-function buildAnnounceRequest(connectionId) {
+function buildAnnounceRequest(connectionId, torrent, port=6881) {
   /**
    *  Announce request format
    * 
@@ -74,7 +77,38 @@ function buildAnnounceRequest(connectionId) {
       88      32-bit integer  key             ? // random
       92      32-bit integer  num_want        -1 // default
       96      16-bit integer  port            ? // should be betwee
-   */
+  */
+
+  const buffer = Buffer.allocUnsafe(98);
+
+  //connection id
+  connectionId.copy(buffer, 0);
+  //action
+  buffer.writeUInt32BE(1, 8);
+  //transaction id
+  crypto.randomBytes(4).copy(buffer, 12);
+  //info has
+  torrentParser.infoHash(torrent).copy(buffer, 16);
+  // peer id
+  util.genId().copy(buffer, 36);
+  // downloaded
+  Buffer.alloc(8).copy(buffer, 56);
+  //left
+  torrentParser.size(torrent).copy(buffer, 64);
+  //uploaded
+  Buffer.alloc(8).copy(buffer, 72);
+  //event
+  buffer.writeUInt32BE(0, 80);
+  //ip address
+  buffer.writeUInt32BE(0, 84);
+  // key
+  crypto.randomBytes(4).copy(buffer, 88);
+  //num want
+  buffer.writeInt32BE(-1, 92);
+  //port
+  buffer.writeUInt16BE(port, 96);
+
+  return buffer;
 }
 
 function parseAnnounceResponse(res) {
@@ -91,7 +125,7 @@ module.exports.getPeers = (torrent, callback) => {
     if(getResType(response) === 'connect') {
 
       const connectionResponse = parseConnectionResponse(response);
-      const announceRequest = buildAnnounceRequest(connectionResponse.connectionId);
+      const announceRequest = buildAnnounceRequest(connectionResponse.connectionId, torrent);
 
       udpSend(socket, announceRequest, url);
     } else if(getResType(response) === 'announce') {
