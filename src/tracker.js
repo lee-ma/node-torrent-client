@@ -10,7 +10,7 @@ const util = require('../util');
 
 function udpSend(socket, message, rawUrl, callback=()=>{}) {
   const url = urlParse(rawUrl);
-  socket.send(message, 0, message.length, url.port, url.host, callback);
+  socket.send(message, 0, message.length, url.port, url.hostname, callback);
 };
 
 function getResType(res) {
@@ -29,7 +29,7 @@ function buildConnectionRequest() {
    * 12       32b' int    transaction_id     random
    */
 
-  const buffer = Buffer.alloc(16);
+  const buffer = Buffer.allocUnsafe(16);
 
   //connection id
   buffer.writeUInt32BE(0x417, 0);

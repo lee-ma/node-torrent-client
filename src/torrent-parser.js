@@ -7,14 +7,14 @@ const bignum = require('bignum');
 
 module.exports.BLOCK_LEN = Math.pow(2, 14);
 
-module.exports.pieceLen = (torrent, pieceIndex) {
+module.exports.pieceLen = (torrent, pieceIndex) => {
   const totalLen = bignum.fromBuffer(this.size(torrent)).toNumber();
   const pieceLen = torrent.info['piece length'];
 
   const lastPieceLen = totalLen % pieceLen;
   const lastPieceIndex = Math.floor(totalLen / pieceLen);
 
-  return lastPieceIndex === pieceIndex ? lastPieceIndex : pieceLen;
+  return lastPieceIndex === pieceIndex ? lastPieceLen : pieceLen;
 }
 
 module.exports.blocksPerPiece = (torrent, pieceIndex) => {
