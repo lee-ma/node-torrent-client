@@ -112,7 +112,41 @@ function buildAnnounceRequest(connectionId, torrent, port=6881) {
 }
 
 function parseAnnounceResponse(res) {
+  /**
+   * response format
+   * 
+   * Offset      Size            Name            Value
+      0           32-bit integer  action          1 // announce
+      4           32-bit integer  transaction_id
+      8           32-bit integer  interval
+      12          32-bit integer  leechers
+      16          32-bit integer  seeders
+      20 + 6 * n  32-bit integer  IP address
+      24 + 6 * n  16-bit integer  TCP port
+      20 + 6 * N
+   */
 
+  function group(iterable, groupSize) {
+    let groups = [];
+    for(let i = 0; i < iterable.length; i += groupSize) {
+      groups.push(iterable.slice(i, i + groupSize));
+    }
+
+    return groups;
+  }
+
+  return {
+    action: res.readUInt32BE(0),
+    transactionId: res.readUInt32BE(4),
+    leechers: res.readUInt32BE(12),
+    seeders: res.readUInt32BE(16),
+    peers: group(res.slice(20), 6).map(address => {
+      return {
+        ip: address.slice(0, 4).join('.'),
+        port: address.readUInt16BE(4)
+      }
+    })
+  }
 }
 
 module.exports.getPeers = (torrent, callback) => {
