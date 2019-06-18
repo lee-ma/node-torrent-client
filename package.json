@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/lee-ma/node-torrent-client/issues"
   },
-  "homepage": "https://github.com/lee-ma/node-torrent-client#readme"
+  "homepage": "https://github.com/lee-ma/node-torrent-client#readme",
+  "dependencies": {
+    "bencode": "^2.0.1"
+  }
 }
