@@ -52,6 +52,15 @@ module.exports.buildUnchoke = () => {
   return buffer;
 };
 
+module.exports.buildInterested = () => {
+  const buffer = Buffer.alloc(5);
+  //length
+  buffer.writeUInt32BE(1, 0);
+  //id
+  buffer.writeUInt8(2, 4);
+  return buffer;
+};
+
 module.exports.buildUninterested = () => {
   const buffer = Buffer.alloc(5);
   //length
